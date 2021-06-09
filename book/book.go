@@ -3,21 +3,14 @@ package book
 import (
 	"fmt"
 	"test/database"
+	"test/model"
 
 	"github.com/gofiber/fiber"
-	"gorm.io/gorm"
 )
-
-type Book struct {
-	gorm.Model
-	Title  string `json:"title"`
-	Author string `json:"author"`
-	Rating int    `json:"rating"`
-}
 
 func GetBooks(c *fiber.Ctx) {
 	db := database.DBConn
-	var books []Book
+	var books []model.Book
 	db.Find(&books)
 	fmt.Print(books)
 	c.JSON(books)
@@ -26,7 +19,7 @@ func GetBooks(c *fiber.Ctx) {
 func GetBook(c *fiber.Ctx) {
 	id := c.Params("id")
 	db := database.DBConn
-	var book Book
+	var book model.Book
 	db.Find(&book, id)
 	c.Status(200).JSON(book)
 }
@@ -34,7 +27,7 @@ func GetBook(c *fiber.Ctx) {
 func NewBook(c *fiber.Ctx) {
 	db := database.DBConn
 
-	book := new(Book)
+	book := new(model.Book)
 
 	if err := c.BodyParser(book); err != nil {
 		fmt.Println(err)
@@ -51,28 +44,28 @@ func NewBook(c *fiber.Ctx) {
 
 func Update(c *fiber.Ctx) {
 
-	bookData := new(Book)
+	bookData := new(model.Book)
 	c.BodyParser(bookData)
 	id := c.Params("id")
 	db := database.DBConn
 
-	var book Book
+	var book model.Book
 	db.First(&book, id)
 	if book.Title == "" {
 		c.Status(500).Send("No Book Found with ID")
 		return
 	} else {
-		db.Model(&book).Updates(Book{Title: bookData.Title, Rating: bookData.Rating, Author: bookData.Author})
+		db.Model(&book).Updates(model.Book{Title: bookData.Title, Rating: bookData.Rating, Author: bookData.Author})
 		c.Status(200).JSON(book)
 	}
 }
 
 func DeleteBook(c *fiber.Ctx) {
-	ID := c.Params("ID")
+	id := c.Params("id")
 	db := database.DBConn
 
-	var book Book
-	db.First(&book, ID)
+	var book model.Book
+	db.First(&book, id)
 	if book.Title == "" {
 		c.Status(500).Send("No Book Found with ID")
 		return

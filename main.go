@@ -2,28 +2,14 @@ package main
 
 import (
 	"fmt"
-	"test/book"
 	"test/database"
+	"test/model"
+	route "test/routes"
 
 	"github.com/gofiber/fiber"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-func helloWorld(c *fiber.Ctx) {
-	c.Send("hello world")
-}
-
-func setupRoutes(app *fiber.App) {
-	app.Get("/", helloWorld)
-
-	app.Get("/api/v1/book", book.GetBooks)
-	app.Get("/api/v1/book/:id", book.GetBook)
-	app.Post("/api/v1/book", book.NewBook)
-	app.Put("/api/v1/book/:id", book.Update)
-	app.Delete("/api/v1/book/:id", book.DeleteBook)
-
-}
 
 func initDatabase() {
 	var err error
@@ -34,13 +20,12 @@ func initDatabase() {
 	} else {
 		fmt.Println("Connection Opened to Database")
 	}
-	database.DBConn.AutoMigrate(&book.Book{})
+	database.DBConn.AutoMigrate(&model.Book{})
 }
 
 func main() {
 	app := fiber.New()
 	initDatabase()
-
-	setupRoutes(app)
+	route.SetupRoutes(app)
 	app.Listen(3000)
 }
