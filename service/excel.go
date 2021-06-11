@@ -3,24 +3,27 @@ package service
 import (
 	"fmt"
 	"strconv"
+	"sync"
+
 	"test/database"
 	"test/model"
-	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/gofiber/fiber"
 )
 
 func DataInsert(c *fiber.Ctx) {
-	go D1()
-	go D2()
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go D1(&wg)
+	go D2(&wg)
 
-	time.Sleep(10 * time.Second)
-	c.Status(200).JSON("Data insert sucessfully")
+	wg.Wait()
+	c.Status(200).JSON("Data inserted sucessfully")
 }
 
-func D1() {
-
+func D1(wg *sync.WaitGroup) {
+	defer wg.Done()
 	detail := new(model.Details)
 	db := database.DBConn
 
@@ -35,8 +38,6 @@ func D1() {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-
-	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>", len(rows))
 
 	for i := 1; i < len(rows)/2; i++ {
 
@@ -72,14 +73,15 @@ func D1() {
 			if j == 6 {
 				detail.Date = rows[i][j]
 			}
+
 		}
 		db.Create(&detail)
 		fmt.Println()
 	}
 }
 
-func D2() {
-
+func D2(wg *sync.WaitGroup) {
+	defer wg.Done()
 	detail := new(model.Details)
 	db := database.DBConn
 
@@ -94,8 +96,6 @@ func D2() {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-
-	// fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>", len(rows))
 
 	for i := len(rows) / 2; i < len(rows); i++ {
 

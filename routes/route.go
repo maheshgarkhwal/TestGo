@@ -18,4 +18,7 @@ func SetupRoutes(app *fiber.App) {
 	//date insert through excel sheet
 	app.Post("/api/v1/xl", service.DataInsert)
 
+	//sending mail
+	app.Post("/api/v1/mail", service.Mailer)
+
 }
