@@ -24,4 +24,9 @@ func SetupRoutes(app *fiber.App) {
 	//data transfer through channels
 	app.Get("api/v1/channels", service.Channel)
 
+	//user registration
+	app.Post("api/v1/register", service.Registeration)
+
+	//user login
+	app.Post("api/v1/login", service.Login)
 }
