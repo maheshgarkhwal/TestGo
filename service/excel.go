@@ -24,7 +24,7 @@ func DataInsert(c *fiber.Ctx) {
 
 func D1(wg *sync.WaitGroup) {
 	defer wg.Done()
-	detail := new(model.Details)
+	detail := new(model.Info)
 	db := database.DBConn
 
 	f, err := excelize.OpenFile("sample.xlsx")
@@ -82,7 +82,7 @@ func D1(wg *sync.WaitGroup) {
 
 func D2(wg *sync.WaitGroup) {
 	defer wg.Done()
-	detail := new(model.Details)
+	detail := new(model.Info)
 	db := database.DBConn
 
 	f, err := excelize.OpenFile("sample.xlsx")

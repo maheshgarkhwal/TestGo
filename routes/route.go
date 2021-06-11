@@ -21,4 +21,7 @@ func SetupRoutes(app *fiber.App) {
 	//sending mail
 	app.Post("/api/v1/mail", service.Mailer)
 
+	//data transfer through channels
+	app.Get("api/v1/channels", service.Channel)
+
 }
