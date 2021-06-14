@@ -41,15 +41,12 @@ func Registeration(c *fiber.Ctx) {
 }
 
 func Login(c *fiber.Ctx) {
-	fmt.Println("login module")
 
 	userData := new(model.User)
 	c.BodyParser(userData)
 	db := database.DBConn
 	var user model.User
-	fmt.Println(userData)
 	db.Find(&user, "Email = ?", userData.Email)
-	fmt.Print(">>>>>", user)
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userData.Password))
 
@@ -99,8 +96,7 @@ func Authentication(c *fiber.Ctx) {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		fmt.Println(claims)
-		c.Status(200).JSON("authorize")
-
+		c.Next()
 	} else {
 		log.Println("Invalid JWT Token")
 		c.Status(400).JSON("invalid json token")

@@ -12,7 +12,6 @@ func GetBooks(c *fiber.Ctx) {
 	db := database.DBConn
 	var books []model.Book
 	db.Find(&books)
-	fmt.Print(books)
 	c.JSON(books)
 }
 
@@ -34,10 +33,6 @@ func NewBook(c *fiber.Ctx) {
 		return
 	}
 
-	fmt.Println(book.Title)
-	fmt.Println(book.Author)
-
-	fmt.Print(book)
 	db.Create(&book)
 	c.Status(200).JSON(book)
 }
