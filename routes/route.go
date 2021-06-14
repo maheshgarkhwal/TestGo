@@ -29,4 +29,9 @@ func SetupRoutes(app *fiber.App) {
 
 	//user login
 	app.Post("api/v1/login", service.Login)
+
+	//token verification
+	app.Post("api/v1/auth", service.Authentication)
+
+	//user file upload
 }
