@@ -3,11 +3,9 @@ package service
 import (
 	"fmt"
 	"sync"
-
-	"github.com/gofiber/fiber"
 )
 
-func Channel(c *fiber.Ctx) {
+func ChannelService() int {
 	var wg sync.WaitGroup
 	ch := make(chan int, 1)
 	wg.Add(2)
@@ -17,7 +15,7 @@ func Channel(c *fiber.Ctx) {
 
 	wg.Wait()
 	val := <-ch
-	fmt.Print("total count is ", val)
+	return val
 }
 
 func func1(wg *sync.WaitGroup, ch chan int) {

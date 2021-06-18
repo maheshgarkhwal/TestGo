@@ -4,11 +4,10 @@ import (
 	"crypto/tls"
 	"fmt"
 
-	"github.com/gofiber/fiber"
 	gomail "gopkg.in/mail.v2"
 )
 
-func Mailer(c *fiber.Ctx) {
+func MailerService() bool {
 	m := gomail.NewMessage()
 
 	// Set E-Mail sender
@@ -35,6 +34,6 @@ func Mailer(c *fiber.Ctx) {
 		fmt.Println(err)
 		panic(err)
 	} else {
-		c.Status(200).JSON("mail sent sucessfully")
+		return true
 	}
 }

@@ -9,17 +9,16 @@ import (
 	"test/model"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
-	"github.com/gofiber/fiber"
 )
 
-func DataInsert(c *fiber.Ctx) {
+func DataInsertService() bool {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go D1(&wg)
 	go D2(&wg)
 
 	wg.Wait()
-	c.Status(200).JSON("Data inserted sucessfully")
+	return true
 }
 
 func D1(wg *sync.WaitGroup) {

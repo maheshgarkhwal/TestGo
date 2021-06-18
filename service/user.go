@@ -14,15 +14,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Registeration(c *fiber.Ctx) {
+func RegisterationService(user *model.User) bool {
 	db := database.DBConn
-
-	user := new(model.User)
-
-	if err := c.BodyParser(user); err != nil {
-		fmt.Println(err)
-		return
-	}
 	password := []byte(user.Password)
 
 	fmt.Print(password)
@@ -36,14 +29,11 @@ func Registeration(c *fiber.Ctx) {
 	fmt.Print(">>>user info  \n", user)
 
 	db.Create(&user)
-	c.Status(200).JSON("user sucessfully created")
-
+	return true
 }
 
-func Login(c *fiber.Ctx) {
+func LoginService(userData *model.User) string {
 
-	userData := new(model.User)
-	c.BodyParser(userData)
 	db := database.DBConn
 	var user model.User
 	db.Find(&user, "Email = ?", userData.Email)
@@ -52,15 +42,13 @@ func Login(c *fiber.Ctx) {
 
 	if err != nil {
 		fmt.Print("error in compareHash", err)
+		return err.Error()
 	} else {
-		fmt.Print("else")
 		token, err := CreateToken(user.Email)
 		if err != nil {
-			c.Status(500).JSON(err.Error())
-			return
+			fmt.Print(err)
 		}
-		c.Status(200).JSON(token)
-
+		return token
 	}
 }
 

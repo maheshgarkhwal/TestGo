@@ -1,34 +1,31 @@
 package route
 
 import (
-	"test/service"
-
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func SetupRoutes(app *fiber.App) {
 
 	//book route
-	app.Get("/api/v1/book", service.Authentication, service.GetBooks)
-	app.Get("/api/v1/book/:id", service.Authentication, service.GetBook)
-	app.Post("/api/v1/book", service.Authentication, service.NewBook)
-	app.Put("/api/v1/book/:id", service.Authentication, service.Update)
-	app.Delete("/api/v1/book/:id", service.Authentication, service.DeleteBook)
+	app.Get("/api/v1/book", GetBooks)
+	app.Get("/api/v1/book/:id", GetBookById)
+	app.Post("/api/v1/book", NewBook)
+	app.Put("/api/v1/book/:id", UpdateBook)
+	app.Delete("/api/v1/book/:id", DeleteBook)
 
 	//date insert through excel sheet
-	app.Post("/api/v1/xl", service.Authentication, service.DataInsert)
+	app.Post("/api/v1/xl", DataInsert)
 
-	//sending mail
-	app.Post("/api/v1/mail", service.Authentication, service.Mailer)
+	//sending mail //service.Authentication
+	app.Post("/api/v1/mail", Mailer)
 
 	//data transfer through channels
-	app.Get("api/v1/channels", service.Authentication, service.Channel)
+	app.Get("api/v1/channels", Channel)
 
 	//user registration
-	app.Post("api/v1/register", service.Authentication, service.Registeration)
+	app.Post("api/v1/register", Registeration)
 
 	//user login
-	app.Post("api/v1/login", service.Login)
+	app.Post("api/v1/login", Login)
 
-	//user file upload
 }
