@@ -2,7 +2,6 @@ package route
 
 import (
 	"fmt"
-	"test/database"
 	"test/model"
 	"test/service"
 
@@ -10,13 +9,13 @@ import (
 )
 
 func GetBooks(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	result := service.GetBooksService()
 	return c.JSON(result)
 }
 
 func NewBook(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	book := new(model.Book)
 
 	if err := c.BodyParser(book); err != nil {
@@ -28,7 +27,7 @@ func NewBook(c *fiber.Ctx) error {
 }
 
 func UpdateBook(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	bookData := new(model.Book)
 	c.BodyParser(bookData)
 	id := c.Params("id")
@@ -41,7 +40,7 @@ func UpdateBook(c *fiber.Ctx) error {
 }
 
 func DeleteBook(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	id := c.Params("id")
 	result := service.DeleteBookService(id)
 	if result.Title == "" {
@@ -51,7 +50,7 @@ func DeleteBook(c *fiber.Ctx) error {
 }
 
 func DataInsert(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	result := service.DataInsertService()
 	if result {
 		return c.Status(200).JSON("data inserted sucessfully")
@@ -61,7 +60,7 @@ func DataInsert(c *fiber.Ctx) error {
 }
 
 func GetBookById(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	id := c.Params("id")
 	result := service.GetBookByIdService(id)
 	if result.Title == "" {
@@ -88,7 +87,7 @@ func Channel(c *fiber.Ctx) error {
 }
 
 func Registeration(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	user := new(model.User)
 	if err := c.BodyParser(user); err != nil {
 		fmt.Println(err)
@@ -103,9 +102,20 @@ func Registeration(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	database.InitDatabase()
+
 	userData := new(model.User)
 	c.BodyParser(userData)
 	result := service.LoginService(userData)
 	return c.Status(200).JSON(result)
+}
+
+func GetUser(c *fiber.Ctx) error {
+	pg := c.Query("page")
+	limit := c.Query("limit")
+	result, message := service.GetUserService(pg, limit)
+	if message != "" {
+		return c.JSON(fiber.Map{"status": "failed", "result": message})
+	} else {
+		return c.JSON(fiber.Map{"status": "sucess", "result": result})
+	}
 }

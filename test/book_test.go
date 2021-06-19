@@ -9,8 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewBook(t *testing.T) {
+func TestConnection(t *testing.T) {
 	database.InitDatabase()
+}
+func TestNewBook(t *testing.T) {
 	book := new(model.Book)
 	book.Author = "arjunartistic"
 	book.Title = "school memories"
@@ -24,20 +26,17 @@ func TestNewBook(t *testing.T) {
 }
 
 func TestGetBook(t *testing.T) {
-	database.InitDatabase()
 	result := service.GetBooksService()
 	require.NotEmpty(t, result)
 }
 
 func GetBookByIdService(t *testing.T) {
-	database.InitDatabase()
 	id := "2"
 	result := service.GetBookByIdService(id)
 	require.NotEmpty(t, result)
 }
 
 func TestDeleteBook(t *testing.T) {
-	database.InitDatabase()
 	id := "21"
 	result := service.DeleteBookService(id)
 	require.NotEmpty(t, result)

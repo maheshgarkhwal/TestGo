@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"test/database"
 	"test/model"
@@ -14,20 +15,40 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func GetUserService(pg string, limit string) ([]model.User, string) {
+	db := database.DBConn
+	var users []model.User
+	RecordLimit, err := strconv.Atoi(limit)
+	if err != nil {
+		fmt.Print(err)
+	}
+	page, err := strconv.Atoi(pg)
+	if err != nil {
+		fmt.Print(err)
+	}
+	offset, err := strconv.Atoi(limit)
+	if err != nil {
+		fmt.Print(err)
+	}
+	if page == 0 {
+		return nil, "page 0 does not exist"
+	} else {
+		offset = (page - 1) * offset
+		db.Limit(RecordLimit).Offset(offset).Find(&users)
+		return users, ""
+	}
+}
+
 func RegisterationService(user *model.User) bool {
 	db := database.DBConn
 	password := []byte(user.Password)
 
-	fmt.Print(password)
 	// Hashing the password with the default cost of 10
 	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(hashedPassword))
 	user.Password = string(hashedPassword)
-	fmt.Print(">>>user info  \n", user)
-
 	db.Create(&user)
 	return true
 }

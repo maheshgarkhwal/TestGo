@@ -28,4 +28,7 @@ func SetupRoutes(app *fiber.App) {
 	//user login
 	app.Post("api/v1/login", Login)
 
+	//GetUser
+	app.Get("api/v1/user/:pg", GetUser)
+
 }
