@@ -12,6 +12,7 @@ import (
 func TestConnection(t *testing.T) {
 	database.InitDatabase()
 }
+
 func TestNewBook(t *testing.T) {
 	book := new(model.Book)
 	book.Author = "arjunartistic"
