@@ -17,5 +17,5 @@ func InitDatabase() {
 	} else {
 		fmt.Println("Connection Opened to Database")
 	}
-	DBConn.AutoMigrate(&model.Book{}, &model.Info{}, &model.User{})
+	DBConn.AutoMigrate(&model.Student{}, &model.Book{}, &model.Info{}, &model.User{})
 }

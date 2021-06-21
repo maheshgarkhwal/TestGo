@@ -29,6 +29,9 @@ func SetupRoutes(app *fiber.App) {
 	app.Post("api/v1/login", Login)
 
 	//GetUser
-	app.Get("api/v1/user/:pg", GetUser)
+	app.Get("api/v1/user", GetUser)
+
+	//implementing api using interface
+	app.Post("api/v1/ibook", PostStudent)
 
 }
