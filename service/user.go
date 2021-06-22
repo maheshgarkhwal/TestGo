@@ -34,7 +34,7 @@ func GetUserService(pg string, limit string) ([]model.User, string) {
 		return nil, "no page exist"
 	} else {
 		offset = (page - 1) * offset
-		db.Limit(RecordLimit).Offset(offset).Find(&users)
+		db.Select("username", "first_name", "last_name", "email").Limit(RecordLimit).Offset(offset).Find(&users)
 		return users, ""
 	}
 }

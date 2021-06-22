@@ -1,11 +1,15 @@
 package route
 
 import (
+	inter "test/interface"
+
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoutes(app *fiber.App) {
+var Service inter.IBook
 
+func SetupRoutes(app *fiber.App, s inter.IBook) {
+	Service = s
 	//book route
 	app.Get("/api/v1/book", GetBooks)
 	app.Get("/api/v1/book/:id", GetBookById)

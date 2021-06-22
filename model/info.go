@@ -1,7 +1,7 @@
 package model
 
 type Info struct {
-	Id        int
+	Id        int `gorm:"primaryKey"`
 	FirstName string
 	LastName  string
 	Gender    string

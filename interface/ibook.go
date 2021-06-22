@@ -3,57 +3,64 @@ package inter
 import (
 	"fmt"
 	"test/database"
-
-	"gorm.io/gorm"
+	"test/model"
 )
 
-type Book struct {
-	gorm.Model
-	Title  string `json:"title"`
-	Author string `json:"author"`
-	Rating int    `json:"rating"`
+type ServiceBook struct {
+}
+
+func NewServiceBook() IBook {
+	return &ServiceBook{}
 }
 
 type IBook interface {
-	NewBookService() Book
-	UpdateBookService(id string) Book
-	GetBookService() []Book
-	DeleteBookService(id string) Book
+	NewBookService(b model.Book) model.Book
+	UpdateBookService(b model.Book, id string) model.Book
+	GetBookService() []model.Book
+	DeleteBookService(id string) model.Book
+	GetBookByIdService(id string) model.Book
 }
 
-func (bk Book) NewBookService() Book {
+func (S *ServiceBook) NewBookService(b model.Book) model.Book {
 	db := database.DBConn
-	db.Create(&bk)
-	fmt.Print(bk)
-	return bk
+	db.Create(&b)
+	fmt.Print(b)
+	return b
 }
 
-func (bk Book) UpdateBookService(id string) Book {
+func (S *ServiceBook) UpdateBookService(b model.Book, id string) model.Book {
 	db := database.DBConn
-	var book Book
+	var book model.Book
 	db.First(&book, id)
 	if book.Title == "" {
 		return book
 	} else {
-		db.Model(&book).Updates(Book{Title: bk.Title, Rating: bk.Rating, Author: bk.Author})
+		db.Model(&book).Updates(model.Book{Title: b.Title, Rating: b.Rating, Author: b.Author})
 		return book
 	}
 }
 
-func (bk Book) GetBookService() []Book {
+func (S *ServiceBook) GetBookService() []model.Book {
 	db := database.DBConn
-	var books []Book
+	var books []model.Book
 	db.Find(&books)
 	return books
 }
 
-func (bk Book) DeleteBookService(id string) Book {
+func (S *ServiceBook) DeleteBookService(id string) model.Book {
 	db := database.DBConn
-	var book Book
+	var book model.Book
 	db.First(&book, id)
 	if book.Title == "" {
 		return book
 	}
 	db.Delete(&book)
+	return book
+}
+
+func (S *ServiceBook) GetBookByIdService(id string) model.Book {
+	db := database.DBConn
+	var book model.Book
+	db.Find(&book, id)
 	return book
 }

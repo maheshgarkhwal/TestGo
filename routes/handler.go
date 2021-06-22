@@ -11,38 +11,37 @@ import (
 
 //Getting all Books
 func GetBooks(c *fiber.Ctx) error {
-	book := new(inter.Book)
-	result := Get(book)
+	result := Get(Service)
 	return c.Status(200).JSON(fiber.Map{"message": "All books", "result": result})
 }
 
-func Get(s inter.IBook) []inter.Book {
+func Get(s inter.IBook) []model.Book {
 	result := s.GetBookService()
 	return result
 }
 
 //registering a new book
 func NewBook(c *fiber.Ctx) error {
-	book := new(inter.Book)
+	book := new(model.Book)
 	if err := c.BodyParser(book); err != nil {
 		fmt.Println(err)
 		return err
 	}
-	result := BookRegister(book)
+	result := BookRegister(*book, Service)
 	return c.Status(200).JSON(fiber.Map{"message": "Book added sucessfully", "result": result})
 }
 
-func BookRegister(s inter.IBook) inter.Book {
-	result := s.NewBookService()
+func BookRegister(b model.Book, s inter.IBook) model.Book {
+	result := s.NewBookService(b)
 	return result
 }
 
 //updating a book
 func UpdateBook(c *fiber.Ctx) error {
-	bookData := new(inter.Book)
+	bookData := new(model.Book)
 	c.BodyParser(bookData)
 	id := c.Params("id")
-	result := BookUpdate(bookData, id)
+	result := BookUpdate(Service, *bookData, id)
 	if result.Title == "" {
 		return c.Status(400).JSON("no book exist for the given id")
 	} else {
@@ -50,8 +49,8 @@ func UpdateBook(c *fiber.Ctx) error {
 	}
 }
 
-func BookUpdate(s inter.IBook, id string) inter.Book {
-	result := s.UpdateBookService(id)
+func BookUpdate(s inter.IBook, bookData model.Book, id string) model.Book {
+	result := s.UpdateBookService(bookData, id)
 	return result
 }
 
@@ -59,16 +58,31 @@ func BookUpdate(s inter.IBook, id string) inter.Book {
 func DeleteBook(c *fiber.Ctx) error {
 
 	id := c.Params("id")
-	book := new(inter.Book)
-	result := BookDelete(book, id)
+	result := BookDelete(Service, id)
 	if result.Title == "" {
 		return c.Status(400).JSON("book does not exist with the given id")
 	}
 	return c.Status(200).JSON(fiber.Map{"message": "Book deleted sucessfully", "result": result})
 }
 
-func BookDelete(s inter.IBook, id string) inter.Book {
+func BookDelete(s inter.IBook, id string) model.Book {
 	result := s.DeleteBookService(id)
+	return result
+}
+
+func GetBookById(c *fiber.Ctx) error {
+
+	id := c.Params("id")
+	result := GetBook(Service, id)
+	if result.Title == "" {
+		return c.JSON(fiber.Map{"status": "true", "message": "no book exist for the given id"})
+	} else {
+		return c.JSON(fiber.Map{"status": "true", "result": result})
+	}
+}
+
+func GetBook(s inter.IBook, id string) model.Book {
+	result := s.GetBookByIdService(id)
 	return result
 }
 
@@ -80,17 +94,6 @@ func DataInsert(c *fiber.Ctx) error {
 		return c.Status(200).JSON("data inserted sucessfully")
 	} else {
 		return c.Status(200).JSON("failed to insert data")
-	}
-}
-
-func GetBookById(c *fiber.Ctx) error {
-
-	id := c.Params("id")
-	result := service.GetBookByIdService(id)
-	if result.Title == "" {
-		return c.JSON("no book exist for the given id")
-	} else {
-		return c.JSON(result)
 	}
 }
 
