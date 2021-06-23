@@ -5,19 +5,23 @@ import (
 	inter "test/interface"
 	"test/model"
 	"test/service"
+	validate "test/validation"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 //Getting all Books
 func GetBooks(c *fiber.Ctx) error {
-	result := Get(Service)
+	result, err := Get(Service)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"message": "unable to get book", "result": err})
+	}
 	return c.Status(200).JSON(fiber.Map{"message": "All books", "result": result})
 }
 
-func Get(s inter.IBook) []model.Book {
-	result := s.GetBookService()
-	return result
+func Get(s inter.IBook) ([]model.Book, error) {
+	result, err := s.GetBookService()
+	return result, err
 }
 
 //registering a new book
@@ -27,31 +31,47 @@ func NewBook(c *fiber.Ctx) error {
 		fmt.Println(err)
 		return err
 	}
-	result := BookRegister(*book, Service)
+	errs := validate.ValidBook(*book)
+	if len(errs) > 0 {
+		return c.Status(401).JSON(fiber.Map{"message": "enter valid input", "result": errs})
+	}
+	result, err := BookRegister(*book, Service)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"message": "unable to create book", "result": err})
+	}
 	return c.Status(200).JSON(fiber.Map{"message": "Book added sucessfully", "result": result})
+
 }
 
-func BookRegister(b model.Book, s inter.IBook) model.Book {
-	result := s.NewBookService(b)
-	return result
+func BookRegister(b model.Book, s inter.IBook) (model.Book, error) {
+	result, err := s.NewBookService(b)
+	return result, err
 }
 
 //updating a book
 func UpdateBook(c *fiber.Ctx) error {
 	bookData := new(model.Book)
 	c.BodyParser(bookData)
+	errs := validate.ValidBook(*bookData)
+	if len(errs) > 0 {
+		return c.Status(401).JSON(fiber.Map{"message": "enter valid input", "result": errs})
+	}
 	id := c.Params("id")
-	result := BookUpdate(Service, *bookData, id)
+	result, err := BookUpdate(Service, *bookData, id)
 	if result.Title == "" {
 		return c.Status(400).JSON("no book exist for the given id")
 	} else {
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"message": "unable to update book", "result": err})
+		}
 		return c.Status(200).JSON(fiber.Map{"message": "Book updated sucessfully", "result": result})
+
 	}
 }
 
-func BookUpdate(s inter.IBook, bookData model.Book, id string) model.Book {
-	result := s.UpdateBookService(bookData, id)
-	return result
+func BookUpdate(s inter.IBook, bookData model.Book, id string) (model.Book, error) {
+	result, err := s.UpdateBookService(bookData, id)
+	return result, err
 }
 
 //delete book
@@ -120,11 +140,15 @@ func Registeration(c *fiber.Ctx) error {
 		fmt.Println(err)
 		return c.Status(500).JSON(err)
 	}
-	result := service.RegisterationService(user)
-	if result {
-		return c.Status(200).JSON("user sucessfully created")
+	errs := validate.ValidUser(*user)
+	if len(errs) > 0 {
+		return c.Status(401).JSON(fiber.Map{"message": "enter valid input", "result": errs})
+	}
+	result, err := service.RegisterationService(user)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"message": "unable to create user", "result": err})
 	} else {
-		return c.Status(500).JSON("unable to create user")
+		return c.Status(200).JSON(fiber.Map{"message": "user sucessfully created", "result": result})
 	}
 }
 

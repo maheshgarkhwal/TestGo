@@ -34,12 +34,12 @@ func GetUserService(pg string, limit string) ([]model.User, string) {
 		return nil, "no page exist"
 	} else {
 		offset = (page - 1) * offset
-		db.Select("username", "first_name", "last_name", "email").Limit(RecordLimit).Offset(offset).Find(&users)
+		db.Select("id", "username", "first_name", "last_name", "email").Limit(RecordLimit).Offset(offset).Find(&users)
 		return users, ""
 	}
 }
 
-func RegisterationService(user *model.User) bool {
+func RegisterationService(user *model.User) (model.User, error) {
 	db := database.DBConn
 	password := []byte(user.Password)
 
@@ -49,8 +49,10 @@ func RegisterationService(user *model.User) bool {
 		panic(err)
 	}
 	user.Password = string(hashedPassword)
-	db.Create(&user)
-	return true
+	if err := db.Create(&user).Error; err != nil {
+		return *user, err
+	}
+	return *user, nil
 }
 
 func LoginService(userData *model.User) string {

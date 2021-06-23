@@ -3,13 +3,16 @@ package route
 import (
 	inter "test/interface"
 
+	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 )
 
 var Service inter.IBook
+var Valid *validator.Validate
 
 func SetupRoutes(app *fiber.App, s inter.IBook) {
 	Service = s
+
 	//book route
 	app.Get("/api/v1/book", GetBooks)
 	app.Get("/api/v1/book/:id", GetBookById)

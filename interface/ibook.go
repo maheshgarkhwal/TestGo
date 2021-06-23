@@ -1,7 +1,6 @@
 package inter
 
 import (
-	"fmt"
 	"test/database"
 	"test/model"
 )
@@ -14,37 +13,43 @@ func NewServiceBook() IBook {
 }
 
 type IBook interface {
-	NewBookService(b model.Book) model.Book
-	UpdateBookService(b model.Book, id string) model.Book
-	GetBookService() []model.Book
+	NewBookService(b model.Book) (model.Book, error)
+	UpdateBookService(b model.Book, id string) (model.Book, error)
+	GetBookService() ([]model.Book, error)
 	DeleteBookService(id string) model.Book
 	GetBookByIdService(id string) model.Book
 }
 
-func (S *ServiceBook) NewBookService(b model.Book) model.Book {
+func (S *ServiceBook) NewBookService(b model.Book) (model.Book, error) {
 	db := database.DBConn
-	db.Create(&b)
-	fmt.Print(b)
-	return b
+
+	if err := db.Create(&b).Error; err != nil {
+		return b, err
+	}
+	return b, nil
 }
 
-func (S *ServiceBook) UpdateBookService(b model.Book, id string) model.Book {
+func (S *ServiceBook) UpdateBookService(b model.Book, id string) (model.Book, error) {
 	db := database.DBConn
 	var book model.Book
 	db.First(&book, id)
 	if book.Title == "" {
-		return book
+		return book, nil
 	} else {
-		db.Model(&book).Updates(model.Book{Title: b.Title, Rating: b.Rating, Author: b.Author})
-		return book
+		if err := db.Model(&book).Updates(model.Book{Title: b.Title, Rating: b.Rating, Author: b.Author}).Error; err != nil {
+			return book, err
+		}
+		return book, nil
 	}
 }
 
-func (S *ServiceBook) GetBookService() []model.Book {
+func (S *ServiceBook) GetBookService() ([]model.Book, error) {
 	db := database.DBConn
 	var books []model.Book
-	db.Find(&books)
-	return books
+	if err := db.Find(&books).Error; err != nil {
+		return books, err
+	}
+	return books, nil
 }
 
 func (S *ServiceBook) DeleteBookService(id string) model.Book {
