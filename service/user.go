@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"test/model"
 	"time"
 
+	
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"golang.org/x/crypto/bcrypt"
@@ -39,7 +41,7 @@ func GetUserService(pg string, limit string) ([]model.User, string) {
 	}
 }
 
-func RegisterationService(user *model.User) (model.User, error) {
+func RegisterationService(user *model.User) (map[string]interface{}, error) {
 	db := database.DBConn
 	password := []byte(user.Password)
 
@@ -50,9 +52,19 @@ func RegisterationService(user *model.User) (model.User, error) {
 	}
 	user.Password = string(hashedPassword)
 	if err := db.Create(&user).Error; err != nil {
-		return *user, err
+		return nil, err
 	}
-	return *user, nil
+	data, err := json.Marshal(user)
+	if err != nil {
+		fmt.Print(err)
+	}
+	m := make(map[string]interface{})
+	err = json.Unmarshal(data, &m)
+	if err != nil {
+		fmt.Print(err)
+	}
+	delete(m, "password")
+	return m, nil
 }
 
 func LoginService(userData *model.User) string {

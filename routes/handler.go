@@ -145,6 +145,8 @@ func Registeration(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"message": "enter valid input", "result": errs})
 	}
 	result, err := service.RegisterationService(user)
+	
+	//fmt.Printf("%T", result)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"message": "unable to create user", "result": err})
 	} else {
